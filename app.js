@@ -420,7 +420,7 @@ function setupNavigation() {
             if (targetView) targetView.classList.add('active');
 
             if (window.innerWidth <= 768) {
-                document.getElementById('sidebar').classList.remove('active');
+                document.getElementById('sidebar').classList.remove('open');
                 document.getElementById('sidebar-overlay').classList.remove('show');
             }
 
@@ -445,12 +445,12 @@ function setupNavigation() {
 
 function setupTopBar() {
     document.getElementById('menu-toggle').addEventListener('click', () => {
-        document.getElementById('sidebar').classList.add('active');
+        document.getElementById('sidebar').classList.add('open');
         document.getElementById('sidebar-overlay').classList.add('show');
     });
 
     document.getElementById('sidebar-overlay').addEventListener('click', () => {
-        document.getElementById('sidebar').classList.remove('active');
+        document.getElementById('sidebar').classList.remove('open');
         document.getElementById('sidebar-overlay').classList.remove('show');
     });
 
