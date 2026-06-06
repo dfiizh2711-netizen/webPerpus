@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DigiLibrary — Sistem Perpustakaan</title>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+        rel="stylesheet">
+
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Loading...</p>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <!-- ==================== AUTH WRAPPER ==================== -->
+    <div id="auth-wrapper">
+
+        <!-- Login View -->
+        <div id="login-container" class="login-wrapper">
+            <div class="login-split-card">
+                <div class="login-image-side">
+                    <h2>SELAMAT DATANG</h2>
+                </div>
+                <div class="login-form-side">
+                    <div class="login-form-content">
+                        <div class="auth-logo">
+                            <i class="ph ph-books"></i>
+                            <span>DigiLibrary</span>
+                        </div>
+                        <div class="auth-tabs"
+                            style="display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 2px solid var(--border-color);">
+                            <button id="tab-login-user" class="btn-tab active"
+                                style="flex: 1; padding: 0.5rem; background: none; border: none; font-weight: bold; color: var(--primary-color); border-bottom: 3px solid var(--primary-color); cursor: pointer;">User</button>
+                            <button id="tab-login-admin" class="btn-tab"
+                                style="flex: 1; padding: 0.5rem; background: none; border: none; font-weight: bold; color: var(--text-light); border-bottom: 3px solid transparent; cursor: pointer;">Admin</button>
+                        </div>
+                        <h2 id="login-title">Login User</h2>
+                        <form id="login-form">
+                            <input type="hidden" id="login-role" value="user">
+                            <div class="input-group split-input-group">
+                                <label for="login-email">Email / Username</label>
+                                <input type="text" id="login-email" placeholder="Email atau Username" required>
+                            </div>
+                            <div class="input-group split-input-group">
+                                <div class="label-row">
+                                    <label for="login-password">Password</label>
+                                    <a href="#" class="forgot-link" id="forgot-link">Lupa password?</a>
+                                </div>
+                                <div class="password-wrapper">
+                                    <input type="password" id="login-password" placeholder="••••••••" required>
+                                    <i class="ph ph-eye toggle-pw" data-target="login-password"></i>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-primary login-btn">
+                                <i class="ph ph-sign-in"></i> Masuk
+                            </button>
+                        </form>
+                        <p class="signup-link">Belum punya akun? <a href="#" id="go-register">Daftar sekarang</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Register View -->
+        <div id="register-container" class="login-wrapper" style="display:none;">
+            <div class="login-split-card">
+                <div class="login-image-side">
+                    <h2>BERGABUNG</h2>
+                </div>
+                <div class="login-form-side">
+                    <div class="login-form-content">
+                        <div class="auth-logo">
+                            <i class="ph ph-books"></i>
+                            <span>DigiLibrary</span>
+                        </div>
+                        <h2>Daftar</h2>
+                        <form id="register-form">
+                            <div class="input-group split-input-group">
+                                <label for="reg-name">Nama Lengkap</label>
+                                <input type="text" id="reg-name" placeholder="Nama Anda" required>
+                            </div>
+                            <div class="input-group split-input-group">
+                                <label for="reg-email">Email</label>
+                                <input type="email" id="reg-email" placeholder="email@example.com" required>
+                            </div>
+                            <div class="input-group split-input-group">
+                                <label for="reg-password">Password</label>
+                                <div class="password-wrapper">
+                                    <input type="password" id="reg-password" placeholder="Min. 6 karakter" required>
+                                    <i class="ph ph-eye toggle-pw" data-target="reg-password"></i>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-primary login-btn">
+                                <i class="ph ph-user-plus"></i> Daftar
+                            </button>
+                        </form>
+                        <p class="signup-link">Sudah punya akun? <a href="#" id="go-login">Login</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Forgot Password View -->
+        <div id="forgot-container" class="login-wrapper" style="display:none;">
+            <div class="login-split-card">
+                <div class="login-image-side">
+                    <h2>RESET PASSWORD</h2>
+                </div>
+                <div class="login-form-side">
+                    <div class="login-form-content">
+                        <div class="auth-logo">
+                            <i class="ph ph-books"></i>
+                            <span>DigiLibrary</span>
+                        </div>
+                        <h2>Lupa Password</h2>
+                        <p style="color: var(--text-light); margin-bottom: 1.5rem;">Masukkan email Anda dan password baru.</p>
+                        <form id="forgot-form">
+                            <input type="hidden" id="forgot-role" value="user">
+                            <div class="input-group split-input-group" id="forgot-name-group" style="display:none;">
+                                <label for="forgot-admin-name">Nama Admin</label>
+                                <input type="text" id="forgot-admin-name" placeholder="Nama Admin Anda">
+                            </div>
+                            <div class="input-group split-input-group">
+                                <label for="forgot-email">Email</label>
+                                <input type="email" id="forgot-email" placeholder="email@example.com" required>
+                            </div>
+                            <div class="input-group split-input-group">
+                                <label for="forgot-password">Password Baru</label>
+                                <div class="password-wrapper">
+                                    <input type="password" id="forgot-password" placeholder="Min. 6 karakter" required>
+                                    <i class="ph ph-eye toggle-pw" data-target="forgot-password"></i>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-primary login-btn">
+                                <i class="ph ph-key"></i> Ganti Password
+                            </button>
+                        </form>
+                        <p class="signup-link">Ingat password Anda? <a href="#" id="go-login-from-forgot">Masuk di sini</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- end auth-wrapper -->
+
+    <!-- ==================== MAIN APP ==================== -->
+    <div class="app-container" id="app-dashboard" style="display:none;">
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="logo">
+                <i class="ph ph-books"></i>
+            </div>
+            <nav class="nav-menu" id="nav-menu">
+                <!-- User nav items -->
+                <a href="#" class="nav-item user-only active" data-view="home-view" data-tooltip="Beranda">
+                    <i class="ph ph-house"></i>
+                </a>
+                <a href="#" class="nav-item user-only" data-view="books-view" data-tooltip="Koleksi Buku">
+                    <i class="ph ph-book-open"></i>
+                </a>
+                <a href="#" class="nav-item user-only" data-view="borrow-view" data-tooltip="Peminjaman Saya">
+                    <i class="ph ph-timer"></i>
+                </a>
+                <a href="#" class="nav-item user-only" data-view="history-view" data-tooltip="Riwayat">
+                    <i class="ph ph-clock-counter-clockwise"></i>
+                </a>
+                <a href="#" class="nav-item user-only" data-view="profile-view" data-tooltip="Profil">
+                    <i class="ph ph-user-circle"></i>
+                </a>
+
+                <!-- Admin nav items (hidden by default) -->
+                <div class="nav-divider admin-only" style="display:none;"></div>
+                <a href="#" class="nav-item admin-only" data-view="admin-dashboard" data-tooltip="Admin Dashboard"
+                    style="display:none;">
+                    <i class="ph ph-chart-bar"></i>
+                </a>
+                <a href="#" class="nav-item admin-only" data-view="admin-books" data-tooltip="Kelola Buku"
+                    style="display:none;">
+                    <i class="ph ph-books"></i>
+                </a>
+                <a href="#" class="nav-item admin-only" data-view="admin-categories" data-tooltip="Kelola Kategori"
+                    style="display:none;">
+                    <i class="ph ph-tag"></i>
+                </a>
+                <a href="#" class="nav-item admin-only" data-view="admin-members" data-tooltip="Kelola Anggota"
+                    style="display:none;">
+                    <i class="ph ph-users"></i>
+                </a>
+                <a href="#" class="nav-item admin-only" data-view="admin-borrowings" data-tooltip="Kelola Peminjaman"
+                    style="display:none;">
+                    <i class="ph ph-swap"></i>
+                </a>
+                <a href="#" class="nav-item admin-only" data-view="admin-reports" data-tooltip="Laporan"
+                    style="display:none;">
+                    <i class="ph ph-file-text"></i>
+                </a>
+            </nav>
+            <div class="sidebar-bottom">
+                <button class="nav-item" id="dark-mode-btn" title="Toggle Dark Mode">
+                    <i class="ph ph-moon"></i>
+                </button>
+                <button class="nav-item" id="logout-btn" title="Logout">
+                    <i class="ph ph-sign-out"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Sidebar Overlay (mobile) -->
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="menu-toggle" id="menu-toggle">
+                        <i class="ph ph-list"></i>
+                    </button>
+                    <div class="search-bar">
+                        <i class="ph ph-magnifying-glass"></i>
+                        <input type="text" id="global-search" placeholder="Cari buku, penulis...">
+                    </div>
+                </div>
+                <div class="user-profile">
+                    <button class="icon-btn dark-toggle-btn" id="dark-toggle-topbar" title="Toggle Dark Mode">
+                        <i class="ph ph-moon" id="dark-icon"></i>
+                    </button>
+                    <button class="icon-btn notif-btn" id="notif-btn" title="Notifikasi">
+                        <i class="ph ph-bell"></i>
+                        <span class="notif-badge" id="notif-badge" style="display:none;">0</span>
+                    </button>
+                    <div class="user-info" id="user-menu-trigger">
+                        <img src="https://ui-avatars.com/api/?name=User&background=d96c6c&color=fff" alt="Avatar"
+                            class="avatar" id="user-avatar-img">
+                        <span class="username" id="user-display-name">User</span>
+                        <i class="ph ph-caret-down" style="font-size:0.8rem;color:var(--text-light);"></i>
+                    </div>
+                    <!-- User dropdown -->
+                    <div class="user-dropdown" id="user-dropdown">
+                        <a href="#" data-view="profile-view" class="dropdown-item nav-item-link">
+                            <i class="ph ph-user"></i> Profil Saya
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" id="dropdown-logout" class="dropdown-item text-danger">
+                            <i class="ph ph-sign-out"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </header>
+
+            <!-- ======= VIEWS ======= -->
+
+            <!-- HOME VIEW -->
+            <div id="home-view" class="view-section active">
+                <div class="home-layout">
+                    <div class="home-left">
+                        <section class="welcome-section">
+                            <div class="welcome-text">
+                                <h1>Selamat membaca,<br><span id="user-greeting-name">Teman</span></h1>
+                                <p>Temukan buku terbaru dan pinjam langsung. Dunia literasi ada di ujung jari Anda.</p>
+                                <button class="btn-primary" id="explore-books-btn">
+                                    Jelajahi Buku <i class="ph ph-arrow-up-right"></i>
+                                </button>
+                            </div>
+                            <div class="current-book-showcase">
+                                <div class="open-book-placeholder">
+
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="popular-section">
+                            <div class="section-header">
+                                <h2>Populer Sekarang</h2>
+                                <div class="dots"><i class="ph ph-dots-three"></i></div>
+                            </div>
+                            <div class="book-list horizontal-scroll" id="popular-books-container">
+                                <!-- Populated by JS -->
+                            </div>
+                        </section>
+
+                        <!-- Active Borrowings in Home -->
+                        <section class="new-series-section" id="home-active-section">
+                            <div class="section-header">
+                                <h2>Sedang Dipinjam</h2>
+                                <a href="#" class="see-all-link nav-item-link" data-view="borrow-view">Lihat semua <i
+                                        class="ph ph-arrow-right"></i></a>
+                            </div>
+                            <div id="home-borrowed-list">
+                                <!-- Populated by JS -->
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="home-right">
+                        <!-- Stats Cards -->
+                        <section class="home-stats">
+                            <div class="stat-card">
+                                <div class="stat-icon bg-blue"><i class="ph ph-books"></i></div>
+                                <div>
+                                    <p class="stat-label">Total Buku</p>
+                                    <h3 class="stat-value" id="stat-total-books">-</h3>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon bg-green"><i class="ph ph-book-open"></i></div>
+                                <div>
+                                    <p class="stat-label">Dipinjam</p>
+                                    <h3 class="stat-value" id="stat-my-borrowed">-</h3>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon bg-red"><i class="ph ph-warning"></i></div>
+                                <div>
+                                    <p class="stat-label">Terlambat</p>
+                                    <h3 class="stat-value" id="stat-overdue">-</h3>
+                                </div>
+                            </div>
+                        </section>
+
+
+                        <section class="overdue-section" id="overdue-alert-section" style="display:none;">
+                            <div class="section-header">
+                                <h2>Peringatan Terlambat</h2>
+                            </div>
+                            <div id="overdue-alert-list"></div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOOKS VIEW -->
+            <div id="books-view" class="view-section">
+                <div class="view-header">
+                    <h1>Koleksi Buku</h1>
+                    <p>Temukan buku yang ingin Anda baca</p>
+                </div>
+                <div class="books-toolbar">
+                    <div class="search-bar books-search">
+                        <i class="ph ph-magnifying-glass"></i>
+                        <input type="text" id="books-search-input" placeholder="Cari judul atau penulis...">
+                    </div>
+                    <select id="category-filter" class="select-field">
+                        <option value="">Semua Kategori</option>
+                    </select>
+                </div>
+                <div class="book-grid" id="books-grid-container">
+                    <!-- Populated by JS -->
+                </div>
+                <div class="pagination-bar" id="books-pagination"></div>
+            </div>
+
+            <!-- BORROW VIEW (Active) -->
+            <div id="borrow-view" class="view-section">
+                <div class="view-header">
+                    <h1>Peminjaman Aktif</h1>
+                    <p>Buku yang sedang Anda pinjam</p>
+                </div>
+                <div id="active-borrowings-container">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- TICKET VIEW -->
+            <div id="ticket-view" class="view-section">
+                <div class="view-header" style="display: flex; align-items: center; gap: 1rem;">
+                    <button class="btn-secondary" id="btn-back-ticket" style="padding: 0.5rem;"><i
+                            class="ph ph-arrow-left"></i></button>
+                    <div>
+                        <h1 style="margin: 0;">Tiket Peminjaman</h1>
+                        <p style="margin: 0;">Detail dan tiket untuk perpustakaan</p>
+                    </div>
+                </div>
+                <div style="max-width: 500px; margin: 2rem auto; display: flex; flex-direction: column; gap: 1rem;">
+                    <div id="ticket-capture-area" class="borrow-ticket">
+                        <div class="ticket-header">
+                            <h3>Tiket Perpustakaan</h3>
+                        </div>
+                        <div class="ticket-body">
+                            <img id="ticket-borrow-cover" src="" alt="Cover" class="ticket-cover">
+                            <div class="ticket-info">
+                                <h4 id="ticket-borrow-title">Judul Buku</h4>
+                                <p><strong>Dipinjam:</strong> <span id="ticket-borrow-date">-</span></p>
+                                <p><strong>Kembali:</strong> <span id="ticket-borrow-due">-</span></p>
+                            </div>
+                        </div>
+                        <div class="ticket-footer">
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Tunjukkan tiket ini
+                                kepada petugas perpustakaan saat mengembalikan buku.</p>
+                        </div>
+                    </div>
+                    <button id="btn-download-ticket" class="btn-primary" style="width: 100%;"><i
+                            class="ph ph-download-simple"></i> Download Tiket</button>
+                </div>
+            </div>
+
+            <!-- HISTORY VIEW -->
+            <div id="history-view" class="view-section">
+                <div class="view-header">
+                    <h1>Riwayat Peminjaman</h1>
+                    <p>Semua riwayat peminjaman buku Anda</p>
+                </div>
+                <div class="table-wrapper">
+                    <table class="data-table" id="history-table">
+                        <thead>
+                            <tr>
+                                <th>Buku</th>
+                                <th>Tanggal Pinjam</th>
+                                <th>Batas Kembali</th>
+                                <th>Dikembalikan</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-tbody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination-bar" id="history-pagination"></div>
+            </div>
+
+            <!-- PROFILE VIEW -->
+            <div id="profile-view" class="view-section">
+                <div class="view-header">
+                    <h1>Profil Saya</h1>
+                </div>
+                <div class="profile-layout">
+                    <div class="profile-card">
+                        <div class="profile-avatar-wrapper">
+                            <img id="profile-avatar" src="" alt="Avatar" class="profile-avatar-img">
+                        </div>
+                        <div class="profile-info">
+                            <h2 id="profile-name-display">-</h2>
+                            <p id="profile-email-display"><i class="ph ph-envelope"></i> -</p>
+                            <span class="role-badge" id="profile-role-badge">Anggota</span>
+                            <p class="profile-joined" id="profile-joined">Bergabung: -</p>
+                        </div>
+                        <div class="profile-stats-row">
+                            <div class="pstat">
+                                <span class="pstat-num" id="pstat-total">0</span>
+                                <span class="pstat-lbl">Total Pinjam</span>
+                            </div>
+                            <div class="pstat">
+                                <span class="pstat-num" id="pstat-active">0</span>
+                                <span class="pstat-lbl">Aktif</span>
+                            </div>
+                            <div class="pstat">
+                                <span class="pstat-num" id="pstat-returned">0</span>
+                                <span class="pstat-lbl">Dikembalikan</span>
+                            </div>
+                            <div class="pstat">
+                                <span class="pstat-num text-danger" id="pstat-overdue">0</span>
+                                <span class="pstat-lbl">Terlambat</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-edit-card">
+                        <h3>Edit Profil</h3>
+                        <form id="profile-edit-form">
+                            <div class="form-group">
+                                <label>Nama Lengkap</label>
+                                <input type="text" id="edit-name" class="input-field" placeholder="Nama Anda" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" id="edit-email" class="input-field" disabled>
+                            </div>
+                            <button type="submit" class="btn-primary">
+                                <i class="ph ph-floppy-disk"></i> Simpan Perubahan
+                            </button>
+                        </form>
+                        <div class="divider"></div>
+                        <h3>Ubah Password</h3>
+                        <form id="change-password-form">
+                            <div class="form-group">
+                                <label>Password Baru</label>
+                                <div class="password-wrapper">
+                                    <input type="password" id="new-password" class="input-field"
+                                        placeholder="Min. 6 karakter" required>
+                                    <i class="ph ph-eye toggle-pw" data-target="new-password"></i>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-secondary">
+                                <i class="ph ph-lock-key"></i> Ubah Password
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ======= ADMIN VIEWS ======= -->
+
+            <!-- ADMIN DASHBOARD -->
+            <div id="admin-dashboard" class="view-section">
+                <div class="view-header">
+                    <h1>Dashboard Admin</h1>
+                    <p>Statistik sistem perpustakaan</p>
+                </div>
+                <div class="admin-stats-grid">
+                    <div class="admin-stat-card bg-blue">
+                        <i class="ph ph-books"></i>
+                        <div>
+                            <h3 id="adm-total-books">0</h3>
+                            <p>Total Buku</p>
+                        </div>
+                    </div>
+                    <div class="admin-stat-card bg-purple">
+                        <i class="ph ph-users"></i>
+                        <div>
+                            <h3 id="adm-total-members">0</h3>
+                            <p>Total Anggota</p>
+                        </div>
+                    </div>
+                    <div class="admin-stat-card bg-green">
+                        <i class="ph ph-book-open"></i>
+                        <div>
+                            <h3 id="adm-active-borrow">0</h3>
+                            <p>Sedang Dipinjam</p>
+                        </div>
+                    </div>
+                    <div class="admin-stat-card bg-red">
+                        <i class="ph ph-warning"></i>
+                        <div>
+                            <h3 id="adm-overdue">0</h3>
+                            <p>Terlambat</p>
+                        </div>
+                    </div>
+                    <div class="admin-stat-card bg-orange">
+                        <i class="ph ph-arrow-u-up-left"></i>
+                        <div>
+                            <h3 id="adm-returned">0</h3>
+                            <p>Total Dikembalikan</p>
+                        </div>
+                    </div>
+                    <div class="admin-stat-card bg-teal">
+                        <i class="ph ph-tag"></i>
+                        <div>
+                            <h3 id="adm-total-cats">0</h3>
+                            <p>Kategori</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Overdue Alert -->
+                <div class="admin-section">
+                    <div class="section-header">
+                        <h2>Notifikasi Terlambat</h2>
+                        <button class="btn-secondary btn-sm" id="refresh-overdue-btn">
+                            <i class="ph ph-arrows-clockwise"></i> Refresh
+                        </button>
+                    </div>
+                    <div id="admin-overdue-list" class="overdue-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Recent Borrowings -->
+                <div class="admin-section">
+                    <div class="section-header">
+                        <h2>Peminjaman Terbaru</h2>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Anggota</th>
+                                    <th>Buku</th>
+                                    <th>Tgl Pinjam</th>
+                                    <th>Batas Kembali</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-recent-borrowings"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ADMIN BOOKS -->
+            <div id="admin-books" class="view-section">
+                <div class="view-header">
+                    <h1>Kelola Buku</h1>
+                    <button class="btn-primary" id="add-book-btn">
+                        <i class="ph ph-plus"></i> Tambah Buku
+                    </button>
+                </div>
+                <div class="books-toolbar">
+                    <div class="search-bar books-search">
+                        <i class="ph ph-magnifying-glass"></i>
+                        <input type="text" id="admin-books-search" placeholder="Cari buku...">
+                    </div>
+                    <select id="admin-books-cat-filter" class="select-field">
+                        <option value="">Semua Kategori</option>
+                    </select>
+                </div>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Cover</th>
+                                <th>Judul</th>
+                                <th>Penulis</th>
+                                <th>Kategori</th>
+                                <th>Stok</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-books-tbody"></tbody>
+                    </table>
+                </div>
+                <div class="pagination-bar" id="admin-books-pagination"></div>
+            </div>
+
+            <!-- ADMIN CATEGORIES -->
+            <div id="admin-categories" class="view-section">
+                <div class="view-header">
+                    <h1>Kelola Kategori</h1>
+                    <button class="btn-primary" id="add-cat-btn">
+                        <i class="ph ph-plus"></i> Tambah Kategori
+                    </button>
+                </div>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Nama Kategori</th>
+                                <th>Dibuat</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-cats-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ADMIN MEMBERS -->
+            <div id="admin-members" class="view-section">
+                <div class="view-header">
+                    <h1>Kelola Anggota</h1>
+                    <button class="btn-primary" id="add-member-btn">
+                        <i class="ph ph-plus"></i> Tambah Anggota
+                    </button>
+                </div>
+                <div class="books-toolbar">
+                    <div class="search-bar books-search">
+                        <i class="ph ph-magnifying-glass"></i>
+                        <input type="text" id="admin-member-search" placeholder="Cari anggota...">
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Avatar</th>
+                                <th>Nama</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Bergabung</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-members-tbody"></tbody>
+                    </table>
+                </div>
+                <div class="pagination-bar" id="admin-members-pagination"></div>
+            </div>
+
+            <!-- ADMIN BORROWINGS -->
+            <div id="admin-borrowings" class="view-section">
+                <div class="view-header">
+                    <h1>Kelola Peminjaman</h1>
+                    <button class="btn-primary" id="add-borrowing-btn">
+                        <i class="ph ph-plus"></i> Tambah Peminjaman
+                    </button>
+                </div>
+                <div class="books-toolbar">
+                    <select id="admin-borrow-status-filter" class="select-field">
+                        <option value="">Semua Status</option>
+                        <option value="borrowed">Dipinjam</option>
+                        <option value="returned">Dikembalikan</option>
+                        <option value="overdue">Terlambat</option>
+                    </select>
+                </div>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Anggota</th>
+                                <th>Buku</th>
+                                <th>Tgl Pinjam</th>
+                                <th>Batas Kembali</th>
+                                <th>Dikembalikan</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-borrowings-tbody"></tbody>
+                    </table>
+                </div>
+                <div class="pagination-bar" id="admin-borrowings-pagination"></div>
+            </div>
+
+            <!-- ADMIN REPORTS -->
+            <div id="admin-reports" class="view-section">
+                <div class="view-header">
+                    <h1>Laporan Peminjaman</h1>
+                    <button class="btn-secondary" id="export-report-btn">
+                        <i class="ph ph-download-simple"></i> Export CSV
+                    </button>
+                </div>
+                <div class="books-toolbar">
+                    <input type="date" id="report-from" class="input-field" style="width:180px;">
+                    <span>s/d</span>
+                    <input type="date" id="report-to" class="input-field" style="width:180px;">
+                    <button class="btn-primary btn-sm" id="report-filter-btn">
+                        <i class="ph ph-funnel"></i> Filter
+                    </button>
+                </div>
+                <div class="report-summary" id="report-summary">
+                    <!-- Stats -->
+                </div>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Anggota</th>
+                                <th>Buku</th>
+                                <th>Tgl Pinjam</th>
+                                <th>Batas Kembali</th>
+                                <th>Dikembalikan</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="report-tbody"></tbody>
+                    </table>
+                </div>
+                <div class="pagination-bar" id="report-pagination"></div>
+            </div>
+
+        </main><!-- end main-content -->
+    </div><!-- end app-container -->
+
+    <!-- ==================== MODALS ==================== -->
+
+    <!-- Book Detail / Borrow Modal -->
+    <div id="book-detail-modal" class="modal">
+        <div class="modal-content modal-wide">
+            <button class="close-btn modal-close"><i class="ph ph-x"></i></button>
+            <div class="book-detail-layout">
+                <div class="book-detail-cover">
+                    <img id="modal-book-cover" src="" alt="Cover">
+                </div>
+                <div class="book-detail-info">
+                    <span class="book-category-tag" id="modal-book-category">Kategori</span>
+                    <h2 id="modal-book-title">-</h2>
+                    <p class="book-author-lg" id="modal-book-author">-</p>
+                    <div class="book-meta-row">
+                        <span id="modal-book-stock" class="stock-badge">Stok: -</span>
+                    </div>
+                    <p class="book-desc" id="modal-book-desc">-</p>
+                    <div class="borrow-form">
+                        <div class="form-group">
+                            <label>NIK (Nomor Induk Kependudukan)</label>
+                            <input type="text" id="borrow-nik" class="input-field" placeholder="Masukkan NIK 16 digit"
+                                pattern="[0-9]{16}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Tanggal Lahir</label>
+                            <input type="date" id="borrow-dob" class="input-field" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Tanggal Pinjam</label>
+                            <input type="date" id="borrow-date" class="input-field" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Tanggal Kembali</label>
+                            <input type="date" id="return-date" class="input-field" required>
+                        </div>
+                        <button id="borrow-confirm-btn" class="btn-primary" style="width:100%;">
+                            <i class="ph ph-book-bookmark"></i> Pinjam Buku
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Borrow Ticket Detail Modal -->
+    <div id="borrow-detail-modal" class="modal">
+        <div class="modal-content modal-md" style="background: transparent; box-shadow: none;">
+            <div class="borrow-ticket">
+                <button class="close-btn modal-close"
+                    style="position: absolute; right: 10px; top: 10px; z-index: 10; color: var(--text-color);"><i
+                        class="ph ph-x"></i></button>
+                <div class="ticket-header">
+                    <h3>Tiket Peminjaman</h3>
+                </div>
+                <div class="ticket-body">
+                    <img id="modal-borrow-cover" src="" alt="Cover" class="ticket-cover">
+                    <div class="ticket-info">
+                        <h4 id="modal-borrow-title">Judul Buku</h4>
+                        <p><strong>Tgl Pinjam:</strong> <span id="modal-borrow-date">-</span></p>
+                        <p><strong>Batas Kembali:</strong> <span id="modal-borrow-due">-</span></p>
+                    </div>
+                </div>
+                <div class="ticket-footer">
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Tunjukkan tiket ini
+                        kepada petugas perpustakaan saat meminjam dan mengembalikan buku.</p>
+                    <button id="modal-return-btn" class="btn-primary" style="width: 100%;">Kembalikan Buku</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Book Form Modal -->
+    <div id="book-form-modal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn modal-close"><i class="ph ph-x"></i></button>
+            <h3 id="book-form-title">Tambah Buku</h3>
+            <form id="book-form">
+                <input type="hidden" id="book-form-id">
+                <div class="form-group">
+                    <label>Judul *</label>
+                    <input type="text" id="bf-title" class="input-field" required>
+                </div>
+                <div class="form-group">
+                    <label>Penulis *</label>
+                    <input type="text" id="bf-author" class="input-field" required>
+                </div>
+                <div class="form-group">
+                    <label>Kategori</label>
+                    <select id="bf-category" class="select-field">
+                        <option value="">Pilih Kategori</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Stok *</label>
+                        <input type="number" id="bf-stock" class="input-field" min="0" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>URL Cover</label>
+                    <input type="url" id="bf-cover" class="input-field" placeholder="https://...">
+                </div>
+                <div class="form-group">
+                    <label>Deskripsi</label>
+                    <textarea id="bf-desc" class="input-field" rows="4" style="resize:vertical;"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary modal-close-btn">Batal</button>
+                    <button type="submit" class="btn-primary">
+                        <i class="ph ph-floppy-disk"></i> Simpan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Category Form Modal -->
+    <div id="cat-form-modal" class="modal">
+        <div class="modal-content modal-sm">
+            <button class="close-btn modal-close"><i class="ph ph-x"></i></button>
+            <h3 id="cat-form-title">Tambah Kategori</h3>
+            <form id="cat-form">
+                <input type="hidden" id="cat-form-id">
+                <div class="form-group">
+                    <label>Nama Kategori *</label>
+                    <input type="text" id="cf-name" class="input-field" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary modal-close-btn">Batal</button>
+                    <button type="submit" class="btn-primary">
+                        <i class="ph ph-floppy-disk"></i> Simpan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Borrowing Form Modal -->
+    <div id="borrowing-form-modal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn modal-close"><i class="ph ph-x"></i></button>
+            <h3 id="borrowing-form-title">Tambah Peminjaman</h3>
+            <form id="borrowing-form">
+                <input type="hidden" id="borrowing-form-id">
+                <div class="form-group">
+                    <label>Anggota *</label>
+                    <select id="bform-user" class="select-field" required>
+                        <option value="">Pilih Anggota</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Buku *</label>
+                    <select id="bform-book" class="select-field" required>
+                        <option value="">Pilih Buku</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Tgl Pinjam *</label>
+                        <input type="date" id="bform-borrow-date" class="input-field" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Batas Kembali *</label>
+                        <input type="date" id="bform-return-date" class="input-field" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="bform-status" class="select-field">
+                        <option value="borrowed">Dipinjam</option>
+                        <option value="returned">Dikembalikan</option>
+                        <option value="overdue">Terlambat</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary modal-close-btn">Batal</button>
+                    <button type="submit" class="btn-primary">
+                        <i class="ph ph-floppy-disk"></i> Simpan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Member Edit Modal -->
+    <div id="member-edit-modal" class="modal">
+        <div class="modal-content modal-sm">
+            <button class="close-btn modal-close"><i class="ph ph-x"></i></button>
+            <h3 id="member-form-title">Edit Anggota</h3>
+            <form id="member-edit-form">
+                <input type="hidden" id="member-edit-id">
+                <div class="form-group">
+                    <label>Nama</label>
+                    <input type="text" id="me-name" class="input-field" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="me-email" class="input-field" required>
+                </div>
+                <div class="form-group" id="me-password-group">
+                    <label>Password <small id="me-password-hint">(Kosongkan jika tidak diubah)</small></label>
+                    <input type="password" id="me-password" class="input-field" placeholder="Min 6 karakter">
+                </div>
+                <div class="form-group">
+                    <label>Role</label>
+                    <select id="me-role" class="select-field">
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary modal-close-btn">Batal</button>
+                    <button type="submit" class="btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirm Delete Modal -->
+    <div id="confirm-modal" class="modal">
+        <div class="modal-content modal-sm">
+            <button class="close-btn modal-close"><i class="ph ph-x"></i></button>
+            <div class="confirm-body">
+                <i class="ph ph-trash confirm-icon text-danger"></i>
+                <h3>Konfirmasi Hapus</h3>
+                <p id="confirm-message">Apakah Anda yakin ingin menghapus data ini?</p>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn-secondary modal-close-btn">Batal</button>
+                <button type="button" class="btn-danger" id="confirm-ok-btn">
+                    <i class="ph ph-trash"></i> Hapus
+                </button>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="app.js"></script>
+</body>
+
+</html>

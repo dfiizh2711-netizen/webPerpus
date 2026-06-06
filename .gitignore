@@ -1,0 +1,33 @@
+# IDE & Editor Files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# System files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Temporary local testing PHP scripts (we are now using Supabase)
+koneksi.php
+alter_db.php
+test_db.php
+debug_save.php
+show_users.php
+update_covers.php
+
+# Local logs
+*.log
+
+# Node dependency directories (in case npm is used)
+node_modules/
+package-lock.json
+
+# Local env files
+.env
+.env.local
+.env.*.local
