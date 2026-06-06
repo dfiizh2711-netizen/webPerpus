@@ -1716,6 +1716,48 @@ input, select, textarea { font-family: inherit; color: var(--text-main); }
     .admin-stats-grid { grid-template-columns: 1fr 1fr; }
     .borrowed-item { flex-direction: column; align-items: flex-start; }
     .data-table th, .data-table td { padding: 0.6rem 0.75rem; }
+
+    /* Responsive History Table for User */
+    #history-table, #history-table tbody, #history-table tr, #history-table td {
+        display: block;
+        width: 100%;
+    }
+    #history-table thead {
+        display: none;
+    }
+    #history-table tr {
+        margin-bottom: 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1rem;
+    }
+    #history-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.6rem 0;
+        border-bottom: 1px dashed var(--border-color);
+        text-align: right;
+    }
+    #history-table td:last-child {
+        border-bottom: none;
+    }
+    #history-table td::before {
+        font-weight: 600;
+        color: var(--text-light);
+        margin-right: 1rem;
+    }
+    #history-table td:nth-child(1)::before { content: "Buku"; }
+    #history-table td:nth-child(2)::before { content: "Tanggal Pinjam"; }
+    #history-table td:nth-child(3)::before { content: "Batas Kembali"; }
+    #history-table td:nth-child(4)::before { content: "Dikembalikan"; }
+    #history-table td:nth-child(5)::before { content: "Status"; }
+    #history-table td:nth-child(6)::before { content: "Aksi"; }
+    
+    #history-table .table-book {
+        justify-content: flex-end;
+        text-align: right;
+    }
 }
 
 /* Borrow Ticket Modal */
