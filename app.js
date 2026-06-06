@@ -94,6 +94,7 @@ let allAdminsData = [];
 let currentAdminAdminsPage = 1;
 
 let allAdminCategoriesData = [];
+let adminBorrowStatusFilter = '';
 
 // Client Supabase Sementara (Tanpa Persist Session) untuk membuat anggota baru oleh Admin
 const tempSupabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
