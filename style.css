@@ -52,12 +52,13 @@
     box-sizing: border-box;
 }
 
-body {
+html, body {
     font-family: var(--font-body);
     background-color: var(--bg-color);
     color: var(--text-main);
     line-height: 1.5;
     overflow-x: hidden;
+    max-width: 100vw;
     transition: background-color 0.3s, color 0.3s;
 }
 
@@ -1383,8 +1384,8 @@ input, select, textarea { font-family: inherit; color: var(--text-main); }
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    width: 100vw;
+    min-height: 100vh;
+    width: 100%;
     background-color: var(--bg-color);
     padding: 1.5rem;
 }
